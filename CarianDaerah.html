@@ -3,43 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carian Daerah</title>
+    <title>Peta dengan Carian</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            background-color: #f0f2f5;
         }
-        .app-container {
+
+        #sidebar {
+            width: 320px;
+            background-color: #ffffff;
+            padding: 25px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        #sidebar h1 {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: #1c1e21;
+        }
+        
+        #sidebar p {
+            font-size: 15px;
+            color: #606770;
+            margin-bottom: 20px;
+        }
+
+        #search-form input[type="text"] {
             width: 100%;
-            height: 100vh;
-            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
-        .back-button {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background-color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: black;
-            border: 1px solid #ccc;
-            z-index: 1000; /* Pastikan butang di atas iframe */
+
+        #search-form button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #1877f2; /* Warna biru Facebook */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #search-form button:hover {
+            background-color: #166fe5;
+        }
+
+        #map-container {
+            flex-grow: 1; /* Penuhi ruang selebihnya */
+            height: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <iframe 
-        class="app-container"
-        src="https://www.google.com/maps/d/u/0/embed?mid=1bYbuL9lZp_vBBxJeElhXHP1f-SeRBFU&ehbc=2E312F">
-    </iframe>
+    <div id="sidebar">
+        <h1>Peta Sempadan</h1>
+        <p>Lihat peta sempadan di sebelah, atau cari lokasi baru menggunakan borang di bawah.</p>
+        
+        <form id="search-form">
+            <input type="text" id="search-input" placeholder="Cari alamat atau tempat..." required>
+            <button type="submit">Cari di Google Maps</button>
+        </form>
+    </div>
 
-    <a href="index.html" class="back-button">
-        &larr; Kembali ke Laman Utama
-    </a>
+    <div id="map-container">
+        <iframe src="https://www.google.com/maps/d/embed?mid=1bYbuL9lZp_vBBxJeElhXHP1f-SeRBFU&ehbc=2E312F"></iframe>
+    </div>
+
+    <script>
+        // Skrip ringkas untuk mengendalikan carian
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            // Menghalang borang daripada memuat semula halaman
+            event.preventDefault(); 
+            
+            // Ambil teks dari kotak carian
+            const query = document.getElementById('search-input').value;
+            
+            // Bina URL carian Google Maps
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+            
+            // Buka URL dalam tab baru
+            window.open(googleMapsUrl, '_blank');
+        });
+    </script>
 
 </body>
 </html>
