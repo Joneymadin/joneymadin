@@ -3,81 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-PTP Dashboard</title>
+    <title>SISTEM e-PTP PKD KUALA SELANGOR</title>
 
     <link rel="icon" href="logo-ik.png" type="image/png">
 
     <style>
+        /* Tetapkan laman dan iframe untuk penuhi skrin */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f2f5;
+            overflow: hidden; /* Sembunyikan sebarang 'scroll bar' tambahan */
         }
-        .container {
-            text-align: center;
-            padding: 40px 50px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-width: 400px;
-        }
-        .logo {
-            width: 80px; /* Saiz logo boleh diubah */
-            height: 80px;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 26px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        .launch-button {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 14px 28px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-        .launch-button:hover {
-            background-color: #0056b3;
-        }
-        .home-link {
-            display: block;
-            margin-top: 30px;
-            color: #777;
-            text-decoration: none;
-            font-size: 14px;
+
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            border: none; /* Buang bingkai di sekeliling iframe */
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="logo-ik.png" alt="Logo e-PTP" class="logo">
-
-        <h1>e-PTP Dashboard</h1>
-        <p>Klik butang di bawah untuk membuka dan mengakses papan pemuka (dashboard) sistem e-PTP.</p>
-        
-        <a href="https://script.google.com/macros/s/AKfycbwtYmlsOO50n8EzqJWtJe1ybJSYOD8orPcwRwmBCpe-Qg6BiPDzTZm2Zv4SKdxzbwXK/exec" target="_blank" rel="noopener noreferrer" class="launch-button">
-            Lancarkan Dashboard
-        </a>
-        
-        <a href="index.html" class="home-link">&larr; Kembali ke Laman Utama</a>
-    </div>
+    <iframe 
+        class="iframe-container"
+        src="https://script.google.com/macros/s/AKfycbwtYmlsOO50n8EzqJWtJe1ybJSYOD8orPcwRwmBCpe-Qg6BiPDzTZm2Zv4SKdxzbwXK/exec">
+    </iframe>
 
 </body>
 </html>
