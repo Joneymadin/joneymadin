@@ -13,21 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
         /* === TEMA UI DENGAN GRADIEN === */
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; position: relative; z-index: 0; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         
-        /* Background Gambar Pudar */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('https://www.ikjon.info/images/brandenforcewell.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.12; /* Kawal tahap terang gambar di sini (Contoh: 0.12 untuk pudar, 1 untuk terang) */
-            z-index: -1;
-        }
-
         .hidden { display: none !important; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; width: 20px; height: 20px; animation: spin 1s ease-in-out infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -82,7 +69,12 @@
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
-    <div id="login-section" class="flex-grow flex items-center justify-center p-4">
+    
+    <!-- BACKGROUND KEKAL (Selamat untuk semua peranti) -->
+    <div class="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat opacity-15" style="background-image: url('https://www.ikjon.info/images/brandenforcewell.png');"></div>
+
+    <!-- SEKSYEN LOG MASUK (Lapis hadapan / z-10) -->
+    <div id="login-section" class="flex-grow flex items-center justify-center p-4 relative z-10">
         <div class="w-full max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white/50">
             <div class="text-center mb-6"><h1 class="text-3xl font-bold text-gray-800">Log Masuk</h1><p class="text-gray-500 mt-2">EnforceWell : ePTP PKD KUALA SELANGOR</p></div>
             <form id="loginForm">
@@ -95,7 +87,9 @@
             </form>
         </div>
     </div>
-    <div id="app-section" class="hidden flex-grow">
+    
+    <!-- SEKSYEN BORANG APLIKASI (Lapis hadapan / z-10) -->
+    <div id="app-section" class="hidden flex-grow relative z-10">
         <div id="loader" class="fixed inset-0 bg-white flex justify-center items-center z-[60]">
             <div class="text-center"><div class="spinner mx-auto mb-4" style="border-top-color:#3b82f6;"></div><p class="text-lg text-gray-600">Memuatkan data borang...</p></div>
         </div>
@@ -171,7 +165,7 @@
         </div>
     </div>
 
-    <!-- FOOTER TAMBAHAN -->
+    <!-- FOOTER TAMBAHAN (Lapis hadapan / z-10) -->
     <footer class="w-full text-center py-6 mt-auto relative z-10">
         <p class="text-sm text-gray-700 font-medium drop-shadow-sm">
             @powered by <a href="https://www.ikjon.info" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors">www.ikjon.info</a>
@@ -196,19 +190,12 @@
         async function callGAS(action, data = {}) {
             const payload = { action: action, ...data };
             try {
-                // Menghantar data sebagai text/plain untuk mengelakkan isu CORS OPTIONS (Preflight)
                 const response = await fetch(GAS_API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', 
-                    },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return await response.json();
             } catch (error) {
                 console.error("API Fetch Error:", error);
@@ -278,8 +265,9 @@
                 const response = await callGAS('login', { noKp, password });
                 
                 if (response.status === 'success') {
-                    loginSection.style.display = 'none';
-                    appSection.style.display = 'block';
+                    // Gunakan classList untuk elak pertindihan CSS pada elemen flex
+                    loginSection.classList.add('hidden');
+                    appSection.classList.remove('hidden');
                     loadInitialData(response.user);
                 } else {
                     statusEl.textContent = response.message;
@@ -300,12 +288,10 @@
             try {
                 const data = await callGAS('getInitialData');
                 
-                // --- PERUBAHAN DI SINI: Tunjuk container DAHULU, baru check error ---
-                mainLoader.style.display = 'none'; // Sembunyikan spinner sentiasa bila call selesai
+                mainLoader.style.display = 'none'; 
                 
                 if (data.status === 'error' || data.error) {
                     alert('Amaran: Gagal memuatkan data dropdown. Sila semak nama-nama Sheet (SITUASI KES, dll) di Google Sheet. Ralat asal: ' + (data.error || data.message || 'Tiada butiran ralat.'));
-                    // Tetap tunjuk container borang supaya nampak sesuatu selain background
                     appContainer.classList.remove('hidden'); 
                     return;
                 }
@@ -329,7 +315,6 @@
                     namaRoSelect.disabled = true;
                 }
                 
-                // Pastikan container nampak kalau semuanya berjaya
                 appContainer.classList.remove('hidden');
                 
             } catch (error) {
@@ -341,7 +326,6 @@
         }
         
         function initializeAllEventListeners() {
-            // BUTANG MENU
             document.getElementById('menu-toggle').addEventListener('click', () => {
                 document.getElementById('sidebar').classList.toggle('-translate-x-full');
                 document.getElementById('sidebar-overlay').classList.toggle('hidden');
@@ -351,7 +335,6 @@
                 document.getElementById('sidebar-overlay').classList.add('hidden');
             });
             
-            // BORANG UTAMA (SUBMIT)
             document.getElementById('inspectionForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const submitBtn = document.getElementById('submitBtn'), submitBtnText = document.getElementById('submitBtnText'), submitSpinner = document.getElementById('submitSpinner');
@@ -365,7 +348,6 @@
                 if (roWasDisabled) document.getElementById('namaRo').disabled = false;
                 if (jantinaWasDisabled) document.getElementById('jantina').disabled = false;
                 
-                // Ambil semua data form
                 const formData = new FormData(this);
                 const formObject = Object.fromEntries(formData.entries());
                 
@@ -402,7 +384,6 @@
                 }
             });
 
-            // SEMUA EVENT LISTENER LAIN
             document.getElementById('namaRo').addEventListener('change', (e) => {
                 const details = roData[e.target.value];
                 document.getElementById('noKpRo').value = details ? details.kp : '';
