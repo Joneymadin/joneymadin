@@ -4,31 +4,481 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EnforceWell: e-PTP PKD KUALA SELANGOR</title>
-
-    <link rel="icon" href="logo-ik.png" type="image/png">
-
+    <!-- Masukkan favicon anda jika ada -->
+    <!-- <link rel="icon" href="logo-ik.png" type="image/png"> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
-        /* Tetapkan laman dan iframe untuk penuhi skrin */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden; /* Sembunyikan sebarang 'scroll bar' tambahan */
+        /* === TEMA UI DENGAN GRADIEN === */
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; position: relative; z-index: 0; }
+        
+        /* Background Gambar Pudar */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://www.ikjon.info/images/brandenforcewell.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.12; /* Kawal tahap terang gambar di sini (Contoh: 0.12 untuk pudar, 1 untuk terang) */
+            z-index: -1;
         }
 
-        .iframe-container {
-            width: 100%;
-            height: 100%;
-            border: none; /* Buang bingkai di sekeliling iframe */
+        .hidden { display: none !important; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; width: 20px; height: 20px; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #login-section {
+            background-color: transparent;
+        }
+        #login-section .input-field:focus + label,
+        #login-section .input-field:not(:placeholder-shown) + label { top: 0; left: 0.75rem; font-size: 0.75rem; color: #3b82f6; background-color: white; padding: 0 0.25rem; transform: translateY(-50%); }
+        #login-section .input-group label { transition: all 0.2s ease; }
+        #login-section .input-field { box-sizing: border-box; }
+        #app-section { background-color: transparent; }
+        
+        /* Kesan kaca (Glassmorphism) pada borang supaya lebih cantik dengan background */
+        .form-section { background-color: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); margin-bottom: 2rem; border: 1px solid rgba(229, 231, 235, 0.8); }
+        
+        .form-title { font-size: 1.25rem; font-weight: 700; color: #1e3a8a; border-bottom: 1px solid #dbeafe; padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .form-title .material-symbols-outlined { font-size: 1.75rem; color: #3b82f6;}
+        #app-section .input-group { position: relative; margin-top: 1.5rem; }
+        #app-section .input-group .material-symbols-outlined { position: absolute; top: 50%; left: 0.8rem; transform: translateY(-50%); color: #9ca3af; transition: color 0.2s; }
+        #app-section .input-group label { position: absolute; top: 50%; left: 2.75rem; transform: translateY(-50%); color: #6b7280; font-weight: 500; padding: 0 0.25rem; background-color: transparent; transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); pointer-events: none; }
+        #app-section .input-field { background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.85rem 0.85rem 0.85rem 2.75rem; width: 100%; transition: all 0.2s; font-size: 0.9rem; box-sizing: border-box; }
+        #app-section .input-field:focus, #app-section .input-field:not(:placeholder-shown), #app-section .input-field:-webkit-autofill { border-color: #3b82f6; background-color: white; outline: none; }
+        #app-section .input-field:focus ~ .material-symbols-outlined { color: #3b82f6; }
+        #app-section .input-field:focus + label, #app-section .input-field:not(:placeholder-shown) + label, #app-section .input-field:-webkit-autofill + label { top: 0; left: 2.7rem; font-size: 0.75rem; color: #3b82f6; background-color: white; padding: 0 0.25rem; }
+        select.input-field { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+        .input-field[readonly], .input-field:disabled { background-color: #e5e7eb; cursor: not-allowed; }
+        .required-star::after { content: " *"; color: #ef4444; }
+        .progress-bar { display: flex; justify-content: space-between; position: relative; }
+        .progress-step { text-align: center; flex-grow: 1; color: #9ca3af; font-weight: 600; transition: color 0.4s ease; z-index: 1; }
+        .progress-step.active { color: #1e3a8a; }
+        .progress-line { position: absolute; height: 4px; background-color: #dbeafe; width: 100%; top: 50%; transform: translateY(-50%); z-index: 0; }
+        .progress-line-fill { position: absolute; height: 4px; background-color: #3b82f6; width: 0%; transition: width 0.4s ease; }
+        
+        .primary-button {
+            display: inline-flex; justify-content: center; align-items: center; gap: 0.5rem;
+            width: 100%; padding: 0.8rem 1.5rem; border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); font-weight: 500; font-size: 1rem;
+            border-radius: 9999px; color: white; cursor: pointer;
+            background-image: linear-gradient(to right, #2563eb, #4f46e5); 
+            transition: all 0.3s ease-in-out;
+        }
+        .primary-button:hover { 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); 
+            transform: translateY(-2px);
+        }
+        .primary-button:disabled {
+            background-image: none;
+            background-color: #6c757d; 
+            cursor: not-allowed; transform: none; box-shadow: none;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <div id="login-section" class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white/50">
+            <div class="text-center mb-6"><h1 class="text-3xl font-bold text-gray-800">Log Masuk</h1><p class="text-gray-500 mt-2">EnforceWell : ePTP PKD KUALA SELANGOR</p></div>
+            <form id="loginForm">
+                <div class="space-y-6">
+                    <div class="input-group relative"><input type="text" id="noKpLogin" name="noKp" class="input-field w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" placeholder=" " required><label for="noKpLogin" class="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pointer-events-none">ID Pengguna (No. KP)</label></div>
+                    <div class="input-group relative"><input type="password" id="password" name="password" class="input-field w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" placeholder=" " required><label for="password" class="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pointer-events-none">Kata Laluan</label></div>
+                </div>
+                <div id="login-status" class="mt-4 text-sm text-center font-medium"></div>
+                <div class="mt-8"><button type="submit" id="loginSubmitBtn" class="primary-button"><span id="loginBtnText">Log Masuk</span><span id="loginSpinner" class="hidden spinner"></span></button></div>
+            </form>
+        </div>
+    </div>
+    <div id="app-section" class="hidden flex-grow">
+        <div id="loader" class="fixed inset-0 bg-white flex justify-center items-center z-[60]">
+            <div class="text-center"><div class="spinner mx-auto mb-4" style="border-top-color:#3b82f6;"></div><p class="text-lg text-gray-600">Memuatkan data borang...</p></div>
+        </div>
+        <div class="p-4 sm:p-8">
+            <div id="app-container" class="max-w-4xl mx-auto hidden">
+                <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300"></div>
+                <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+                    <div class="p-4"><h2 class="text-xl font-bold text-gray-800 mb-4">Menu</h2><div id="menu-container" class="space-y-2"></div></div>
+                </div>
+                <button id="menu-toggle" class="fixed top-4 left-4 z-30 p-2 rounded-md bg-white/80 backdrop-blur-sm text-gray-600 hover:bg-gray-200/80 transition-colors shadow-md">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="text-center mb-8"><h1 class="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">EnforceWell : ePTP PKD KUALA SELANGOR</h1><p class="text-gray-500 mt-2">Sila isi semua maklumat yang diperlukan dengan teliti.</p></div>
+                <div class="sticky top-4 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-sm z-10 mb-8 border border-gray-200">
+                    <div class="progress-bar"><div class="progress-line"><div id="progressLineFill" class="progress-line-fill"></div></div><div id="step1" class="progress-step active">Anggota</div><div id="step2" class="progress-step">Operasi</div><div id="step3" class="progress-step">Pemeriksaan</div></div>
+                </div>
+                <form id="inspectionForm">
+                    <div id="section1" class="form-section">
+                        <h2 class="form-title"><span class="material-symbols-outlined">group</span>Bahagian 1: Maklumat Anggota</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                            <div class="input-group"><span class="material-symbols-outlined">topic</span><select id="situasiKes" name="situasiKes" class="input-field" required></select><label for="situasiKes" class="required-star">Situasi Kes</label></div>
+                            <div></div><div class="input-group"><span class="material-symbols-outlined">person</span><select id="namaRo" name="namaRo" class="input-field"></select><label for="namaRo">Nama RO</label></div>
+                            <div class="input-group hidden"><input type="text" id="noKpRo" name="noKpRo" class="input-field" readonly></div>
+                            <div class="input-group"><span class="material-symbols-outlined">work</span><input type="text" id="jawatanRo" name="jawatanRo" class="input-field" readonly><label for="jawatanRo">Jawatan RO</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">mail</span><input type="email" id="emelRo" name="emelRo" class="input-field" readonly><label for="emelRo">Emel RO</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">support_agent</span><select id="namaAro" name="namaAro" class="input-field" required></select><label for="namaAro" class="required-star">Nama ARO</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">work</span><input type="text" id="jawatanAro" name="jawatanAro" class="input-field" readonly><label for="jawatanAro">Jawatan ARO</label></div>
+                            <div class="input-group hidden"><input type="text" id="noKpAro" name="noKpAro" class="input-field" readonly></div>
+                        </div>
+                    </div>
+                    <div id="section2" class="form-section">
+                        <h2 class="form-title"><span class="material-symbols-outlined">event_note</span>Bahagian 2: Maklumat Operasi</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                            <div class="input-group"><span class="material-symbols-outlined">calendar_today</span><input type="date" id="tarikhOperasi" name="tarikhOperasi" class="input-field" required><label for="tarikhOperasi" class="required-star">Tarikh Operasi</label></div>
+                            <div class="input-group md:col-span-2"><span class="material-symbols-outlined">location_on</span><textarea id="alamatPremis" name="alamatPremis" rows="2" class="input-field" placeholder=" " required></textarea><label for="alamatPremis" class="required-star">Alamat Premis</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">schedule</span><input type="time" id="masaTaklimat" name="masaTaklimat" class="input-field" required><label for="masaTaklimat" class="required-star">Masa Taklimat Operasi</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">schedule</span><input type="time" id="masaTiba" name="masaTiba" class="input-field" required><label for="masaTiba" class="required-star">Masa Tiba di Lokasi</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">schedule</span><input type="time" id="masaMula" name="masaMula" class="input-field" required><label for="masaMula" class="required-star">Masa Mula Pemeriksaan</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">schedule</span><input type="time" id="masaMeninggalkan" name="masaMeninggalkan" class="input-field" required><label for="masaMeninggalkan" class="required-star">Masa Meninggalkan Premis</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">schedule</span><input type="time" id="masaBalik" name="masaBalik" class="input-field" required><label for="masaBalik" class="required-star">Masa Balik ke Pejabat</label></div>
+                        </div>
+                    </div>
+                    <div id="section3" class="form-section">
+                        <h2 class="form-title"><span class="material-symbols-outlined">plagiarism</span>Bahagian 3: Maklumat Pemeriksaan Premis</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                            <div class="input-group"><span class="material-symbols-outlined">person_search</span><input type="text" id="namaOrangDitemui" name="namaOrangDitemui" class="input-field" placeholder=" " required><label for="namaOrangDitemui" class="required-star">Nama Orang Yang Ditemui</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">badge</span><select id="jenisPengenalan" name="jenisPengenalan" class="input-field" required><option value="">-- Sila Pilih --</option><option value="NO. KP">NO. KP</option><option value="NO. PASSPORT">NO. PASSPORT</option><option value="NO. UNCHR">NO. UNCHR</option><option value="LAIN-LAIN">LAIN-LAIN</option></select><label for="jenisPengenalan" class="required-star">Jenis Pengenalan Diri</label></div>
+                            <div id="lain-lain-container" class="input-group hidden"><span class="material-symbols-outlined">help</span><input type="text" id="jenisPengenalanLain" name="jenisPengenalanLain" class="input-field" placeholder=" "><label for="jenisPengenalanLain">Sila Nyatakan Jenis Pengenalan</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">pin</span><input type="text" id="noPengenalan" name="noPengenalan" class="input-field" placeholder=" " required><label for="noPengenalan" class="required-star">No. Pengenalan Diri</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">elderly</span><input type="number" id="umur" name="umur" class="input-field" placeholder=" " readonly><label for="umur">Umur</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">cake</span><input type="text" id="tarikhLahir" name="tarikhLahir" class="input-field" placeholder=" " readonly><label for="tarikhLahir">Tarikh Lahir</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">wc</span><select id="jantina" name="jantina" class="input-field" disabled><option value="">-- Sila Pilih --</option><option value="LELAKI">LELAKI</option><option value="WANITA">WANITA</option></select><label for="jantina">Jantina</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">apartment</span><input type="text" id="namaSyarikat" name="namaSyarikat" class="input-field" placeholder=" "><label for="namaSyarikat" id="labelSyarikat">Nama Syarikat</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">tag</span><input type="text" id="noSyarikat" name="noSyarikat" class="input-field" placeholder=" "><label for="noSyarikat" id="labelNoSyarikat">No. Syarikat</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">engineering</span><input type="text" id="jawatanStatus" name="jawatanStatus" class="input-field" placeholder=" " required><label for="jawatanStatus" class="required-star">Jawatan/Status</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">flag</span><input type="text" id="bangsa" name="bangsa" class="input-field" placeholder=" " required><label for="bangsa" class="required-star">Bangsa</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">maps_home_work</span><select id="bahagianPremis" name="bahagianPremis" class="input-field" required></select><label for="bahagianPremis" class="required-star">Bahagian Premis Pembiakan</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">bug_report</span><input type="text" id="tempatLarva" name="tempatLarva" class="input-field" placeholder=" " required><label for="tempatLarva" class="required-star">Tempat Larva Ditemui</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">my_location</span><select id="kedudukanLarva" name="kedudukanLarva" class="input-field" required></select><label for="kedudukanLarva" class="required-star">Kedudukan Larva Ditemui</label></div>
+                            <div id="kedudukan-lain-container" class="input-group hidden"><span class="material-symbols-outlined">help</span><input type="text" id="kedudukanLarvaLain" name="kedudukanLarvaLain" class="input-field" placeholder=" "><label for="kedudukanLarvaLain">Nyatakan Kedudukan Larva</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">format_list_numbered</span><select id="jumlahLarva" name="jumlahLarva" class="input-field" required><option value="">-- Sila Pilih --</option><option>Satu (1)</option><option>Dua (2)</option><option>Tiga (3)</option><option>Empat (4)</option><option>Lima (5)</option><option>Enam (6)</option><option>Tujuh (7)</option><option>Lapan (8)</option><option>Sembilan (9)</option><option>Sepuluh (10)</option><option>LAIN-LAIN</option></select><label for="jumlahLarva" class="required-star">Jumlah Larva Diambil</label></div>
+                            <div id="jumlah-lain-container" class="input-group hidden"><span class="material-symbols-outlined">help</span><input type="text" id="jumlahLarvaLain" name="jumlahLarvaLain" class="input-field" placeholder=" "><label for="jumlahLarvaLain">Sila Nyatakan Jumlah</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">label</span><input type="text" id="noLabel" name="noLabel" class="input-field" placeholder=" " required><label for="noLabel" class="required-star">No. Label</label></div>
+                            <div class="input-group"><span class="material-symbols-outlined">person_check</span><select id="namaPemeriksaLarva" name="namaPemeriksaLarva" class="input-field" required></select><label for="namaPemeriksaLarva" class="required-star">Nama Pemeriksa Larva</label></div>
+                            <div class="input-group md:col-span-2"><span class="material-symbols-outlined">edit_note</span><textarea id="catatan" name="catatan" rows="3" class="input-field" placeholder=" "></textarea><label for="catatan">Catatan</label></div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-4">
+                        <button type="submit" id="submitBtn" class="primary-button"><span id="submitBtnText">Hantar Borang</span><span id="submitSpinner" class="hidden spinner"></span></button>
+                        <div id="status" class="mt-4 text-sm font-medium"></div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <iframe 
-        class="iframe-container"
-        src="https://script.google.com/macros/s/AKfycbxdNWI_9k_MXa1t79nUlKIV_XleGeuMxngCbIXlfzLQ1lxTF-UI59WXVv5YOcrP6Iswaw/exec">
-    </iframe>
+    <!-- FOOTER TAMBAHAN -->
+    <footer class="w-full text-center py-6 mt-auto relative z-10">
+        <p class="text-sm text-gray-700 font-medium drop-shadow-sm">
+            @powered by <a href="https://www.ikjon.info" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors">www.ikjon.info</a>
+        </p>
+    </footer>
 
+    <script>
+        // =========================================================
+        // URL WEB APP APPS SCRIPT ANDA DI SINI
+        // Gantikan URL ini dengan URL Web App anda yang terbaharu
+        // =========================================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwtYmlsOO50n8EzqJWtJe1ybJSYOD8orPcwRwmBCpe-Qg6BiPDzTZm2Zv4SKdxzbwXK/exec";
+
+        // --- PEMBOLEHUBAH GLOBAL & RUJUKAN ELEMEN ---
+        let roData = {}, aroData = {};
+        const loginSection = document.getElementById('login-section');
+        const appSection = document.getElementById('app-section');
+        const appContainer = document.getElementById('app-container');
+        const mainLoader = document.getElementById('loader');
+
+        // --- FUNGSI KOMUNIKASI (FETCH API) ---
+        async function callGAS(action, data = {}) {
+            const payload = { action: action, ...data };
+            try {
+                // Menghantar data sebagai text/plain untuk mengelakkan isu CORS OPTIONS (Preflight)
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', 
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error("API Fetch Error:", error);
+                throw error;
+            }
+        }
+
+        // --- FUNGSI-FUNGSI UTILITI ---
+        function showStatus(message, type = 'success') {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = '';
+            statusEl.className = 'mt-4 text-sm font-medium p-3 rounded-md border';
+            statusEl.classList.add(type === 'success' ? 'text-green-700' : 'bg-red-100', type === 'success' ? 'border-green-200' : 'border-red-200', type === 'error' ? 'text-red-700' : 'bg-green-100');
+            statusEl.textContent = message;
+        }
+        function populateSelect(elementId, options, placeholder) {
+            const select = document.getElementById(elementId);
+            if (!select) return;
+            select.innerHTML = '';
+            if (placeholder) select.add(new Option(placeholder, ""));
+            options.forEach(option => select.add(new Option(option, option)));
+        }
+        function populateMenu(menuItems) {
+            const container = document.getElementById('menu-container');
+            if (!container) return;
+            container.innerHTML = '';
+            menuItems.forEach(item => {
+                const link = document.createElement('a');
+                link.href = item.url; link.target = '_blank';
+                link.className = 'flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 transition-colors';
+                link.innerHTML = `<span class="material-symbols-outlined text-gray-500 text-sm">launch</span><span>${item.name}</span>`;
+                container.appendChild(link);
+            });
+        }
+        function parseKP(kp) {
+            if (!kp || kp.length !== 14) return;
+            const yearStr = kp.substring(0, 2), month = kp.substring(2, 4), day = kp.substring(4, 6);
+            const lastDigit = parseInt(kp.charAt(13)), currentYear = new Date().getFullYear();
+            let birthYear = parseInt(yearStr) + (parseInt(yearStr) > (currentYear % 100) ? 1900 : 2000);
+            const dob = new Date(birthYear, parseInt(month) - 1, parseInt(day));
+            const [tarikhLahirInput, umurInput, jantinaInput] = [document.getElementById('tarikhLahir'), document.getElementById('umur'), document.getElementById('jantina')];
+            if (!isNaN(dob.getTime()) && dob.getMonth() === parseInt(month) - 1) {
+                tarikhLahirInput.value = `${day}/${month}/${birthYear}`;
+                let age = currentYear - dob.getFullYear();
+                const m = new Date().getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && new Date().getDate() < dob.getDate())) age--;
+                umurInput.value = age;
+                jantinaInput.value = (lastDigit % 2 === 0) ? 'WANITA' : 'LELAKI';
+            } else {
+                tarikhLahirInput.value = 'FORMAT KP TIDAK SAH'; umurInput.value = ''; jantinaInput.value = '';
+            }
+        }
+
+        // --- LOGIK UTAMA APLIKASI ---
+        async function handleLogin(event) {
+            event.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn'), btnText = document.getElementById('loginBtnText'), spinner = document.getElementById('loginSpinner'), statusEl = document.getElementById('login-status');
+            const noKp = document.getElementById('noKpLogin').value, password = document.getElementById('password').value;
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.classList.remove('hidden');
+            statusEl.textContent = 'Mengesahkan...';
+            statusEl.style.color = '#606770';
+            
+            try {
+                const response = await callGAS('login', { noKp, password });
+                
+                if (response.status === 'success') {
+                    loginSection.style.display = 'none';
+                    appSection.style.display = 'block';
+                    loadInitialData(response.user);
+                } else {
+                    statusEl.textContent = response.message;
+                    statusEl.style.color = 'red';
+                    btn.disabled = false;
+                    btnText.style.display = 'block';
+                    spinner.classList.add('hidden');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Ralat sambungan rangkaian.';
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        async function loadInitialData(loggedInUser) {
+            try {
+                const data = await callGAS('getInitialData');
+                
+                if (data.status === 'error' || data.error) {
+                    alert('Gagal memuatkan data borang.');
+                    mainLoader.innerHTML = `<p class="text-red-500">Gagal memuatkan data.</p>`;
+                    return;
+                }
+                
+                roData = data.roData || {};
+                aroData = data.aroData || {};
+                populateMenu(data.menuItems || []);
+                populateSelect('situasiKes', data.situasiKes || [], '-- Sila Pilih Situasi --');
+                populateSelect('bahagianPremis', data.bahagianPremis || [], '-- Sila Pilih Bahagian --');
+                populateSelect('kedudukanLarva', [...(data.kedudukanLarva || []), 'LAIN-LAIN'], '-- Sila Pilih Kedudukan --');
+                populateSelect('namaPemeriksaLarva', data.pemeriksaLarva || [], '-- Sila Pilih Pemeriksa --');
+                populateSelect('namaRo', Object.keys(roData), '-- Sila Pilih RO --');
+                populateSelect('namaAro', Object.keys(aroData), '-- Sila Pilih ARO --');
+                
+                initializeAllEventListeners(); 
+                
+                if (loggedInUser && roData[loggedInUser.name]) {
+                    const namaRoSelect = document.getElementById('namaRo');
+                    namaRoSelect.value = loggedInUser.name;
+                    namaRoSelect.dispatchEvent(new Event('change'));
+                    namaRoSelect.disabled = true;
+                }
+                
+                mainLoader.style.display = 'none';
+                appContainer.classList.remove('hidden');
+                
+            } catch (error) {
+                mainLoader.innerHTML = `<p class="text-red-500">Ralat kritikal: Gagal menghubungi server. Sila muat semula.</p>`;
+            }
+        }
+        
+        function initializeAllEventListeners() {
+            // BUTANG MENU
+            document.getElementById('menu-toggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.toggle('hidden');
+            });
+            document.getElementById('sidebar-overlay').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            });
+            
+            // BORANG UTAMA (SUBMIT)
+            document.getElementById('inspectionForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submitBtn'), submitBtnText = document.getElementById('submitBtnText'), submitSpinner = document.getElementById('submitSpinner');
+                
+                submitBtn.disabled = true;
+                submitBtnText.classList.add('hidden');
+                submitSpinner.classList.remove('hidden');
+                document.getElementById('status').innerHTML = '';
+                
+                const roWasDisabled = document.getElementById('namaRo').disabled, jantinaWasDisabled = document.getElementById('jantina').disabled;
+                if (roWasDisabled) document.getElementById('namaRo').disabled = false;
+                if (jantinaWasDisabled) document.getElementById('jantina').disabled = false;
+                
+                // Ambil semua data form
+                const formData = new FormData(this);
+                const formObject = Object.fromEntries(formData.entries());
+                
+                if (roWasDisabled) document.getElementById('namaRo').disabled = true;
+                if (jantinaWasDisabled) document.getElementById('jantina').disabled = true;
+                
+                if (formObject.jenisPengenalan === 'LAIN-LAIN') formObject.jenisPengenalan = formObject.jenisPengenalanLain;
+                if (formObject.kedudukanLarva === 'LAIN-LAIN') formObject.kedudukanLarva = formObject.kedudukanLarvaLain;
+                if (formObject.jumlahLarva === 'LAIN-LAIN') formObject.jumlahLarva = formObject.jumlahLarvaLain;
+                delete formObject.jenisPengenalanLain; delete formObject.kedudukanLarvaLain; delete formObject.jumlahLarvaLain;
+                
+                try {
+                    const response = await callGAS('saveData', { data: formObject });
+                    
+                    if (response.status === 'success') {
+                        showStatus(response.message, 'success');
+                        this.reset();
+                        this.querySelectorAll('select, input').forEach(el => el.dispatchEvent(new Event('change')));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                         if (roWasDisabled) {
+                            const roSelect = document.getElementById('namaRo');
+                            roSelect.dispatchEvent(new Event('change'));
+                            roSelect.disabled = true;
+                        }
+                    } else { 
+                        showStatus(response.message, 'error'); 
+                    }
+                } catch (error) {
+                    showStatus('Ralat menghantar borang, sila cuba lagi.', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtnText.classList.remove('hidden');
+                    submitSpinner.classList.add('hidden');
+                }
+            });
+
+            // SEMUA EVENT LISTENER LAIN
+            document.getElementById('namaRo').addEventListener('change', (e) => {
+                const details = roData[e.target.value];
+                document.getElementById('noKpRo').value = details ? details.kp : '';
+                document.getElementById('jawatanRo').value = details ? details.jawatan : '';
+                document.getElementById('emelRo').value = details ? details.email : '';
+            });
+            document.getElementById('namaAro').addEventListener('change', (e) => {
+                const details = aroData[e.target.value];
+                document.getElementById('noKpAro').value = details ? details.kp : '';
+                document.getElementById('jawatanAro').value = details ? details.jawatan : '';
+            });
+            ['alamatPremis', 'namaSyarikat', 'noSyarikat', 'jawatanStatus', 'bangsa', 'tempatLarva', 'noLabel', 'jenisPengenalanLain', 'kedudukanLarvaLain', 'jumlahLarvaLain'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+            });
+            document.getElementById('kedudukanLarva').addEventListener('change', e => {
+                const isLain = e.target.value === 'LAIN-LAIN';
+                document.getElementById('kedudukan-lain-container').classList.toggle('hidden', !isLain);
+                document.getElementById('kedudukanLarvaLain').required = isLain;
+                if (!isLain) document.getElementById('kedudukanLarvaLain').value = '';
+            });
+            document.getElementById('jumlahLarva').addEventListener('change', e => {
+                const isLain = e.target.value === 'LAIN-LAIN';
+                document.getElementById('jumlah-lain-container').classList.toggle('hidden', !isLain);
+                document.getElementById('jumlahLarvaLain').required = isLain;
+                if (!isLain) document.getElementById('jumlahLarvaLain').value = '';
+            });
+            document.getElementById('situasiKes').addEventListener('change', e => {
+                const isMandatory = e.target.value.toUpperCase().includes('SYARIKAT');
+                document.getElementById('namaSyarikat').required = isMandatory;
+                document.getElementById('labelSyarikat').classList.toggle('required-star', isMandatory);
+                document.getElementById('noSyarikat').required = isMandatory;
+                document.getElementById('labelNoSyarikat').classList.toggle('required-star', isMandatory);
+                if (!isMandatory) { document.getElementById('namaSyarikat').value = ''; document.getElementById('noSyarikat').value = ''; }
+            });
+            document.getElementById('jenisPengenalan').addEventListener('change', e => {
+                const idType = e.target.value;
+                const isLain = idType === 'LAIN-LAIN', isKp = idType === 'NO. KP';
+                document.getElementById('lain-lain-container').classList.toggle('hidden', !isLain);
+                document.getElementById('jenisPengenalanLain').required = isLain;
+                if (!isLain) document.getElementById('jenisPengenalanLain').value = '';
+                document.getElementById('tarikhLahir').readOnly = isKp;
+                document.getElementById('umur').readOnly = isKp;
+                document.getElementById('jantina').disabled = isKp;
+                if (!isKp) { ['noPengenalan', 'tarikhLahir', 'umur', 'jantina'].forEach(id => document.getElementById(id).value = ''); }
+            });
+            document.getElementById('noPengenalan').addEventListener('input', e => {
+                if (document.getElementById('jenisPengenalan').value !== 'NO. KP') return;
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 6) value = value.slice(0, 6) + '-' + value.slice(6);
+                if (value.length > 9) value = value.slice(0, 9) + '-' + value.slice(9);
+                e.target.value = value.slice(0, 14);
+                if (e.target.value.length === 14) parseKP(e.target.value);
+                else { ['tarikhLahir', 'umur', 'jantina'].forEach(id => document.getElementById(id).value = ''); }
+            });
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        document.querySelectorAll('.progress-step').forEach(el => el.classList.remove('active'));
+                        const fill = document.getElementById('progressLineFill');
+                        const [step1, step2, step3] = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+                        if (sectionId === 'section1') {
+                            step1.classList.add('active'); fill.style.width = '0%';
+                        } else if (sectionId === 'section2') {
+                            [step1, step2].forEach(s => s.classList.add('active')); fill.style.width = '50%';
+                        } else if (sectionId === 'section3') {
+                            [step1, step2, step3].forEach(s => s.classList.add('active')); fill.style.width = '100%';
+                        }
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px", threshold: 0.1 });
+            
+            document.querySelectorAll('.form-section').forEach(section => {
+                if (section) observer.observe(section);
+            });
+        }
+        
+        // --- MULAKAN APLIKASI ---
+        document.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        });
+    </script>
 </body>
 </html>
