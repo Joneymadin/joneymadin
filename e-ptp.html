@@ -300,9 +300,13 @@
             try {
                 const data = await callGAS('getInitialData');
                 
+                // --- PERUBAHAN DI SINI: Tunjuk container DAHULU, baru check error ---
+                mainLoader.style.display = 'none'; // Sembunyikan spinner sentiasa bila call selesai
+                
                 if (data.status === 'error' || data.error) {
-                    alert('Gagal memuatkan data borang.');
-                    mainLoader.innerHTML = `<p class="text-red-500">Gagal memuatkan data.</p>`;
+                    alert('Amaran: Gagal memuatkan data dropdown. Sila semak nama-nama Sheet (SITUASI KES, dll) di Google Sheet. Ralat asal: ' + (data.error || data.message || 'Tiada butiran ralat.'));
+                    // Tetap tunjuk container borang supaya nampak sesuatu selain background
+                    appContainer.classList.remove('hidden'); 
                     return;
                 }
                 
@@ -325,11 +329,14 @@
                     namaRoSelect.disabled = true;
                 }
                 
-                mainLoader.style.display = 'none';
+                // Pastikan container nampak kalau semuanya berjaya
                 appContainer.classList.remove('hidden');
                 
             } catch (error) {
-                mainLoader.innerHTML = `<p class="text-red-500">Ralat kritikal: Gagal menghubungi server. Sila muat semula.</p>`;
+                mainLoader.style.display = 'none';
+                appContainer.classList.remove('hidden');
+                alert("Ralat sambungan untuk muat data awal. Anda boleh nampak borang, tapi senarai pilihan (dropdown) mungkin kosong. Sila periksa internet atau CORS.");
+                console.error("Load Initial Data Error: ", error);
             }
         }
         
